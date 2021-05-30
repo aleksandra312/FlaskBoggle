@@ -1,16 +1,34 @@
 class BoggleGame {
-    constructor(boardId) {
+    constructor(boardId, sec = 60) {
         this.board = $('#' + boardId);
         this.score = 0;
+        this.sec = sec;
+        this.timer = setInterval(this.calculateTime.bind(this), 1000);
+
         $('#guess-form', this.board).on('submit', this.handleSubmit.bind(this));
     }
 
-    displayGuessResult(message, cls) {
+    displayMessage(message, cls) {
         $('.msg', this.board).text(message).removeClass().addClass(`msg ${cls}`);
     }
 
     displayScore() {
         $('.score', this.board).text(this.score);
+    }
+
+    displayTimer() {
+        $('.timer', this.board).text(this.sec);
+    }
+
+    async calculateTime() {
+        this.sec -= 1;
+        this.displayTimer();
+
+        if (this.sec === 0) {
+            clearInterval(this.timer);
+            $('#guess-form', this.board).hide();
+            this.displayMessage('Time is up!', 'ok');
+        }
     }
 
     async handleSubmit(evt) {
@@ -25,13 +43,14 @@ class BoggleGame {
         if (result) {
             switch (result) {
                 case 'ok':
-                    this.displayGuessResult(`Found a word: ${word}!`, 'ok');
+                    this.displayMessage(`Found a word: ${word}!`, 'ok');
                     this.score += word.length;
                     this.displayScore();
                     break;
                 default:
-                    this.displayGuessResult(`Word ${word} is not on board or is not valid. Try again!`, 'err');
+                    this.displayMessage(`Word ${word} is not on board or is not valid. Try again!`, 'err');
             }
         }
+        $word.val('').focus();
     }
 }
