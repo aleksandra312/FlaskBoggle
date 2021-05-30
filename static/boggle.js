@@ -28,6 +28,14 @@ class BoggleGame {
             clearInterval(this.timer);
             $('#guess-form', this.board).hide();
             this.displayMessage('Time is up!', 'ok');
+            await this.postHighestScore();
+        }
+    }
+
+    async postHighestScore() {
+        const resp = await axios.post('/post-score', { score: this.score });
+        if (resp.data.newHighScore) {
+            this.displayMessage(`Congratulations! New high score ${this.score}`, 'ok');
         }
     }
 
